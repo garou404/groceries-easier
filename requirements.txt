@@ -1,0 +1,5 @@
+flask
+dash
+sqlalchemy
+flask_sqlalchemy
+pandas
