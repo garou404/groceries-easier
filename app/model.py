@@ -25,9 +25,9 @@ recipe_article = db.Table(
     'recipe_article',
     db.Column('recipe_id', db.Integer, db.ForeignKey('recipe.id')),
     db.Column('article_id', db.Integer, db.ForeignKey('article.id')),
-    db.Column('kg', db.Integer),
-    db.Column('quantity', db.Integer)
+    db.Column('quantity', db.String)
 )
+
 
 with app.app_context():
     db.create_all()
