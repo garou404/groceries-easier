@@ -1,5 +1,13 @@
-from app import db, app
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db' # utilisation de SQLite en local
+
+# pour postgreSQL, définir l'URI appropriée ici
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
 
 class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -28,7 +36,20 @@ recipe_article = db.Table(
     db.Column('quantity', db.String)
 )
 
-
-
 with app.app_context():
     db.create_all()
+
+    recipes = db.session.query(Recipe, recipe_article, Article).filter(
+        Recipe.id == recipe_article.c.recipe_id
+        ).filter(
+            recipe_article.c.article_id == Article.id            
+            ).all()
+    
+    dict_recipes = {}
+    
+    for recipe in recipes:
+        if not recipe.Recipe.name in dict_recipes:
+            dict_recipes[recipe.Recipe.name] = []
+        dict_recipes[recipe.Recipe.name].append({recipe.Article.name: recipe.quantity})
+
+print(dict_recipes)
