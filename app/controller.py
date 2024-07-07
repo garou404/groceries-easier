@@ -16,11 +16,20 @@ def get_recipes():
     
     recipes_dict = {}
     
+    current_recipe = ''
+    recipe_dict = {}
+    new_list_test = []
     for recipe in recipes:
+        if current_recipe != recipe.Recipe.name:
+            if recipe_dict:
+                new_list_test.append(recipe_dict)
+            current_recipe = recipe.Recipe.name
+            recipe_dict = {'name' : recipe.Recipe.name, 'id': recipe.Recipe.id, 'ingredients': {}}
+        recipe_dict['ingredients'].update({recipe.Article.name: recipe.quantity})
         if not recipe.Recipe.name in recipes_dict:
             recipes_dict[recipe.Recipe.name] = {}
         recipes_dict[recipe.Recipe.name].update({recipe.Article.name: recipe.quantity})
-    return recipes_dict
+    return new_list_test
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -40,7 +40,7 @@ with app.app_context():
     db.create_all()
 
     list_of_atricle_strings = [
-        'Banane', 'Fruit et Légume',
+    'Banane', 'Fruit et Légume',
     'Oeuf', 'Cremerie lait oeuf',
     'Pomme', 'Fruit et Légume',
     'Scamorza', 'Cremerie lait oeuf',
