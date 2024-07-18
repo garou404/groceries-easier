@@ -1,7 +1,7 @@
 from app import db, app
 from dash import dcc, html, Input, Output, State, callback, ALL, MATCH, ctx
 from app.model import Article, Recipe
-from app.controller import add_article, get_recipes
+from app.controller import add_article, get_recipes, get_list_articles
 import pandas as pd
 
 
@@ -65,11 +65,17 @@ def display_output(n_clicks):
     groceries_list.to_csv('groceries-list.csv', sep=';', index=False)
     return str(recipe_id)+' added'
 
-
-def get_list_recipes():
-    groceries_list = pd.read_csv('groceries-list.csv', sep=';')
-    list_layout = []
-    for id in groceries_list['recipe_id']:
-        list_layout.append(html.Div([id]))
-    print(list_layout)
-    return list_layout
+@callback(
+    Output('groceries-list-container', 'children'),
+    Input('app-url', 'href')
+)
+def get_list_recipes(url):
+    groceries_list = pd.read_csv('groceries-list.csv', sep=';')['recipe_id'].tolist()
+    print(groceries_list)
+    get_list_articles(groceries_list)
+    # list_layout = []
+    # for id in groceries_list['recipe_id']:
+    #     list_layout.append(html.Div([id]))
+    # print(list_layout)
+    # return list_layout
+    return 'coucou'

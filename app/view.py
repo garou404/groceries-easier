@@ -7,12 +7,14 @@ from app.callback import *
 
 dash_app = dash.Dash(__name__, server=app)
 
+
+
 dash_app.layout = html.Div([
-    # dcc.Link(id='app-url', href='home'),
+    dcc.Link(id='app-url', href='home'),
     # 'Hello application',
     html.Div([
         html.Div([], id='trash-output'),
-        html.Div(children=get_list_recipes(), id='groceries-list-container')
+        html.Div(id='groceries-list-container')
     ], className='col-md-6'),
     html.Div(
         [
