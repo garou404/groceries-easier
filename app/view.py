@@ -10,11 +10,13 @@ dash_app = dash.Dash(__name__, server=app)
 
 
 dash_app.layout = html.Div([
-    dcc.Link(id='app-url', href='home'),
+    dcc.Location(id='app-url'),
     # 'Hello application',
     html.Div([
         html.Div([], id='trash-output'),
-        html.Div(id='groceries-list-container')
+        html.Div([
+            html.Div(id='groceries-list-container', className='bg-success-subtle p-2')
+        ], className='p-5 ')
     ], className='col-md-6'),
     html.Div(
         [
@@ -27,7 +29,7 @@ dash_app.layout = html.Div([
         id='recipes-container',
         className='col-md-6 h-100'
         )
-], className='fluid-container row h-100')
+], className='fluid-container d-flex h-100')
 
 if __name__ == '__main__':
     dash_app.run(debug=True)

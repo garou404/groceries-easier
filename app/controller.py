@@ -34,21 +34,25 @@ def get_recipes():
     return new_list_test
 
 
-def get_list_articles(recipe_ids):
+def get_articles_list(recipe_ids):
     results = db.session.query(Recipe).filter(Recipe.id.in_(recipe_ids))
     dict_articles = {
-        'id': [],
+        # 'id': [],
         'article': [],
         'aisle': [],
     }
     id = 0
     for r in results:
         for article in r.article:
-            dict_articles['id'].append(id)
+            # dict_articles['id'].append(id)
             dict_articles['article'].append(article.name)
             dict_articles['aisle'].append(article.aisle)
             id += 1
+
     df = pd.DataFrame(dict_articles)
-    print(df.sort_values(by=['aisle']))
+    df['number'] = 1
+    df = df.groupby(['article', 'aisle'])['number'].sum().reset_index()
+    df = df.sort_values(by=['aisle'])
+    return df
 if __name__ == '__main__':
     app.run(debug=True)

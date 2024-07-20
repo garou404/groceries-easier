@@ -1,8 +1,25 @@
 from app import db, app
 from dash import dcc, html, Input, Output, State, callback, ALL, MATCH, ctx
 from app.model import Article, Recipe
-from app.controller import add_article, get_recipes, get_list_articles
+from app.controller import add_article, get_recipes, get_articles_list
 import pandas as pd
+
+
+GROCERIES_ORDER = [
+    'Entretien maison',
+    'Beauté',
+    'Surgelés',
+    'Produit du monde',
+    'Epicerie sucrée',
+    'Epicerie salée',
+    'Epices',
+    'Produit frais',
+    'Viande',
+    'Poisson',
+    'Stand Charcuterie',
+    'Cremerie lait oeuf',
+    'Fruit et Légume',
+    ]
 
 
 # @callback(
@@ -67,15 +84,24 @@ def display_output(n_clicks):
 
 @callback(
     Output('groceries-list-container', 'children'),
-    Input('app-url', 'href')
+    Input('app-url', 'href'),
+    prevent_initial_call=True
 )
 def get_list_recipes(url):
     groceries_list = pd.read_csv('groceries-list.csv', sep=';')['recipe_id'].tolist()
-    print(groceries_list)
-    get_list_articles(groceries_list)
-    # list_layout = []
-    # for id in groceries_list['recipe_id']:
-    #     list_layout.append(html.Div([id]))
-    # print(list_layout)
-    # return list_layout
-    return 'coucou'
+    df = get_articles_list(groceries_list)
+    html_layout = []
+    for aisle in GROCERIES_ORDER:
+        df_articles_per_aisle = df.loc[df['aisle'] == aisle]
+        if df_articles_per_aisle.empty is False:
+            articles_per_aisle = []
+            for index, row in df_articles_per_aisle.iterrows():
+                articles_per_aisle.append(row['article'])
+            # checklist_component['options'] = articles_per_aisle
+            checklist_component = dcc.Checklist(options=articles_per_aisle)
+            html_content_aisle = html.Div([
+                html.Div([aisle], className='h5'), 
+                checklist_component
+            ])
+            html_layout.append(html_content_aisle)
+    return html_layout
