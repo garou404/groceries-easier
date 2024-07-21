@@ -21,25 +21,6 @@ GROCERIES_ORDER = [
     'Fruit et Légume',
     ]
 
-
-# @callback(
-#     Output('recipes-container', 'children'), 
-#     Input('app-url', 'href')
-# )
-# def get_recipes_layout(app_url):
-#     recipes_dict = get_recipes()
-    
-#     recipes_layout = []
-    
-#     for recipe_name in recipes_dict:
-#         components_list = [html.Label([recipe_name], className='h4 mr-3')]
-#         ingredient_list = []
-#         for article in recipes_dict[recipe_name]:
-#             ingredient_list.append(article+', ')
-#         components_list.append(html.Div(ingredient_list))
-#         recipe_layout = html.Div(components_list, className='mb-4 bg-info-subtle mx-4 p-2')
-#         recipes_layout.append(recipe_layout)
-
 def get_recipes_layout():
     recipes_dict = {}
     with app.app_context():
@@ -51,7 +32,7 @@ def get_recipes_layout():
         components_list = [html.Label([recipe['name']], className='h4 mr-3')]
         ingredient_list = []
         for article in recipe['ingredients']:
-            ingredient_list.append(article+', ')
+            ingredient_list.append(article['name']+', ')
         components_list.append(html.Div(ingredient_list))
         # print(components_list)
         recipe_layout = html.Div([
@@ -82,6 +63,7 @@ def display_output(n_clicks):
     groceries_list.to_csv('groceries-list.csv', sep=';', index=False)
     return str(recipe_id)+' added'
 
+
 @callback(
     Output('groceries-list-container', 'children'),
     Input('app-url', 'href'),
@@ -96,8 +78,10 @@ def get_list_recipes(url):
         if df_articles_per_aisle.empty is False:
             articles_per_aisle = []
             for index, row in df_articles_per_aisle.iterrows():
-                articles_per_aisle.append(row['article'])
-            # checklist_component['options'] = articles_per_aisle
+                quantity_str = str(row['quantity'])
+                if row['quantity_unit'] != 'unit':
+                    quantity_str +=''+row['quantity_unit']
+                articles_per_aisle.append(quantity_str+' '+row['article'])
             checklist_component = dcc.Checklist(options=articles_per_aisle)
             html_content_aisle = html.Div([
                 html.Div([aisle], className='h5'), 

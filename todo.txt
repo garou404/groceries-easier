@@ -1,0 +1,5 @@
+remove the selected recipe from the proposed recipes
+make a selected recipe div under the groceries list 
+add a cross next to each recipe to remove it from the list
+make a space to add alone article with a search bar
+add a space to add article and recipe in the database
