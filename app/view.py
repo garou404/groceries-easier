@@ -8,7 +8,6 @@ from app.callback import *
 dash_app = dash.Dash(__name__, server=app)
 
 
-
 dash_app.layout = html.Div([
     dcc.Location(id='app-url'),
     # 'Hello application',
@@ -16,7 +15,13 @@ dash_app.layout = html.Div([
         html.Div([], id='trash-output'),
         html.Div([
             html.Div(id='groceries-list-container', className='bg-success-subtle p-2')
-        ], className='p-5 ')
+        ], className='p-5 '),
+        html.Div(className='row',
+                 children=[
+                    html.Div(className='d-flex align-content-start flex-wrap', id='selected-recipe-container', children=[
+
+                    ])
+                 ])
     ], className='col-md-6'),
     html.Div(
         [

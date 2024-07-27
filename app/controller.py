@@ -9,16 +9,19 @@ def add_article(name, aisle, calorie=None, kg_for_calorie=None, price=None):
     db.session.add(new_article)
     db.session.commit()
 
-def get_recipes(recipes_list=None):
+def get_recipes(recipes_list=None, recipes_to_remove=[]):
     if recipes_list:
-        # Query
-        recipes = db.session.query(Recipe, recipe_article, Article).filter(
-            Recipe.id == recipe_article.c.recipe_id
-            ).filter(
-                recipe_article.c.article_id == Article.id            
+        if recipes_list[0] != -1:
+            # Query
+            recipes = db.session.query(Recipe, recipe_article, Article).filter(
+                Recipe.id == recipe_article.c.recipe_id
                 ).filter(
-                    Recipe.id.in_(recipes_list)
-                ).all()
+                    recipe_article.c.article_id == Article.id            
+                    ).filter(
+                        Recipe.id.in_(recipes_list)
+                    ).all()
+        else:
+            return {}
     else:
         # Query
         recipes = db.session.query(Recipe, recipe_article, Article).filter(
@@ -31,11 +34,11 @@ def get_recipes(recipes_list=None):
     
     current_recipe = ''
     recipe_dict = {}
-    new_list_test = []
+    new_list = []
     for recipe in recipes:
         if current_recipe != recipe.Recipe.name:
             if recipe_dict:
-                new_list_test.append(recipe_dict)
+                new_list.append(recipe_dict)
             current_recipe = recipe.Recipe.name
             recipe_dict = {'name' : recipe.Recipe.name, 'id': recipe.Recipe.id, 'ingredients': []}
         recipe_dict['ingredients'].append({
@@ -45,7 +48,9 @@ def get_recipes(recipes_list=None):
         if not recipe.Recipe.name in recipes_dict:
             recipes_dict[recipe.Recipe.name] = {}
         recipes_dict[recipe.Recipe.name].update({recipe.Article.name: recipe.quantity})
-    return new_list_test
+    if len(recipes_to_remove) > 0:
+        new_list = [recipe for recipe in new_list if recipe['id'] not in recipes_to_remove]
+    return new_list
 
 def decompose_string(input_string, num):
     # Define a regular expression pattern to match digits and letters
