@@ -87,9 +87,14 @@ def get_html_groceries_list(url):
 @callback(
     Output('selected-recipe-container', 'children'),
     Input('app-url', 'href'),
-    prevent_initial_call=True
+    # prevent_initial_call=True
 )
 def get_html_selected_recipes(_):
+    html_content = get_html_selected_recipes()
+
+    return html_content
+
+def get_html_selected_recipes():
     recipes_groceries_list = pd.read_csv('groceries-list.csv', sep=';')['recipe_id'].tolist()
     if len(recipes_groceries_list) == 0:
         recipes_groceries_list = [-1]
@@ -103,11 +108,12 @@ def get_html_selected_recipes(_):
                 html.Button('X', id={'type': 'btn-remove-recipe', 'index': recipe['id']}, className='btn btn-danger small', n_clicks=0)
             ], className='p-3 mx-2 bg-info-subtle')
         )
-
     return html_content
 
+
 @callback(
-    Output("trash-output", "children", allow_duplicate=True),
+    Output('selected-recipe-container', 'children', allow_duplicate=True),
+    Output('groceries-list-container', 'children', allow_duplicate=True),
     Input({"type": "btn-add-recipe", "index": ALL}, "n_clicks"),
     prevent_initial_call=True
 )
@@ -116,7 +122,28 @@ def add_recipe_ingredients_to_the_list(n_clicks):
     groceries_list = pd.read_csv('groceries-list.csv', sep=';')
     groceries_list = pd.concat([groceries_list, pd.DataFrame({'recipe_id': [recipe_id]})])
     groceries_list.to_csv('groceries-list.csv', sep=';', index=False)
-    return str(recipe_id)+' added'
+
+    # evoluate make it take the current list and avoid read_csv again
+    html_content = get_html_selected_recipes()
+    recipes_groceries_list = groceries_list['recipe_id'].tolist()
+    df = get_articles_list(recipes_groceries_list)
+    html_layout = []
+    for aisle in GROCERIES_ORDER:
+        df_articles_per_aisle = df.loc[df['aisle'] == aisle]
+        if df_articles_per_aisle.empty is False:
+            articles_per_aisle = []
+            for index, row in df_articles_per_aisle.iterrows():
+                quantity_str = str(row['quantity'])
+                if row['quantity_unit'] != 'unit':
+                    quantity_str +=''+row['quantity_unit']
+                articles_per_aisle.append(quantity_str+' '+row['article'])
+            checklist_component = dcc.Checklist(options=articles_per_aisle)
+            html_content_aisle = html.Div([
+                html.Div([aisle], className='h5'), 
+                checklist_component
+            ])
+            html_layout.append(html_content_aisle)
+    return html_content, html_layout
 
 @callback(
     Output("trash-output", "children"),
